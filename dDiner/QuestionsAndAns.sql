@@ -1,5 +1,4 @@
--- 7. Which item was purchased just before the customer became a member?
--- 8. What is the total items and amount spent for each member before they became a member?
+
 -- 9.  If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?
 -- 10. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?
 
@@ -102,4 +101,43 @@ SELECT customer_id, order_date,product_name
 FROM firstOrdersAfterMember
 WHERE ranks = 1
 
+------
+-- 7. Which item was purchased just before the customer became a member?
+------
 
+-- Reverse of Qs 6
+WITH firstOrdersBeforeMember AS (
+	
+		SELECT 
+			s.customer_id, 
+			m.product_name,
+			s.order_date,
+			RANK() OVER(PARTITION BY s.customer_id ORDER BY s.order_date) AS ranks
+		FROM sales s JOIN menu m
+		ON s.product_id = m.product_id
+		JOIN members mb
+			ON s.customer_id = mb.customer_id
+		WHERE s.order_date < mb.join_date
+		ORDER BY s.order_date
+	)
+
+SELECT customer_id, order_date,product_name
+FROM firstOrdersBeforeMember
+WHERE ranks = 1
+
+------
+-- 8. What is the total items and amount spent for each member before they became a member?
+------
+
+-- Again modify above CTE to get the info 
+
+SELECT 
+	s.customer_id AS "Customer ID", 
+	count(s.product_id) AS "Total Items",
+	SUM(m.price) AS "Total Amount"
+FROM sales s JOIN menu m
+	ON s.product_id = m.product_id
+JOIN members mb
+	ON s.customer_id = mb.customer_id
+WHERE s.order_date < mb.join_date
+GROUP BY s.customer_id 
