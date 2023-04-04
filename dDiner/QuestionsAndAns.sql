@@ -1,7 +1,3 @@
-
--- 9.  If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?
--- 10. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?
-
 ------
 -- 1. What is the total amount each customer spent at the restaurant?
 ------
@@ -141,3 +137,29 @@ JOIN members mb
 	ON s.customer_id = mb.customer_id
 WHERE s.order_date < mb.join_date
 GROUP BY s.customer_id 
+
+------
+-- 9.  If each $1 spent equates to 10 points and sushi has a 2x points multiplier - how many points would each customer have?
+------
+
+WITH membersPoints AS (
+	
+SELECT product_id, product_name,
+CASE
+	WHEN product_name like 'sushi' THEN price*20
+	ELSE price*10 
+	END AS points
+FROM menu
+
+)
+
+SELECT s.customer_ID, SUM(mp.points) AS "Total Points"
+FROM sales s JOIN membersPoints mp 
+	ON s.product_ID = mp.product_ID
+GROUP BY s.customer_ID
+
+------
+-- 10. In the first week after a customer joins the program (including their join date) they earn 2x points on all items, not just sushi - how many points do customer A and B have at the end of January?
+------
+
+
