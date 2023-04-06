@@ -20,6 +20,19 @@ GROUP BY customer_i
 -- Notes use distinct inside count to get only unique dates 
 
 ------
+-- 2.1 As B visited the most, what items did B buy? Order by dates ASC
+------
+SELECT s.customer_id, m.product_name, s.order_date
+FROM sales s JOIN menu m
+	ON s.product_id = m.product_id
+WHERE s.customer_id LIKE 'B'
+ORDER BY s.order_date
+
+
+
+
+
+------
 -- 3. What was the first item from the menu purchased by each customer?
 ------
 
@@ -34,6 +47,24 @@ FROM firstOrderRank f JOIN menu m
 WHERE f.ranks = 1
 ORDER BY f.customer_ID
 -- Again use distinct to solve the issue that we seen when customer ordered the same item twice 
+
+------
+-- 3.1 Names of the most purchased items listed in descending order 
+------
+SELECT m.product_name, COUNT(s.product_ID) AS "Total"
+FROM sales s JOIN menu m
+	ON s.product_id = m.product_id
+GROUP BY m.product_name
+ORDER BY COUNT(s.product_ID)
+
+------
+-- 3.2 Modify above query to show each customers  
+------
+SELECT s.customer_ID, m.product_name, COUNT (s.product_ID)
+FROM sales s JOIN menu m
+	ON s.product_id = m.product_id
+GROUP BY m.product_name, s.customer_ID
+ORDER BY s.customer_ID
 
 ------
 -- 4. What is the most purchased item on the menu and how many times was it purchased by all customers?
