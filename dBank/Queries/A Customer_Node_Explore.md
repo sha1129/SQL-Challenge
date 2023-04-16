@@ -39,7 +39,14 @@ ORDER BY COUNT(node_id) DESC
 4. How many days on average are customers reallocated to a different node?
 
 ```SQL
+SELECT ROUND(AVG(DATE(end_date) - DATE(start_date)),2) AS dateDff
+FROM customer_nodes
+WHERE EXTRACT (YEAR FROM end_date) != 9999
 ```
+
+Approximately takes 14 days on average for customers reallocated to a different node.
+There is no date difference function in PostgreSQL. To find date differences use DATE() and minus end date with start date. Also, need to watch for data that are corrupted or bad dates. For example I seen dates with year 9999 
+
 
 5. What is the median, 80th and 95th percentile for this same reallocation days metric for each region?
 
