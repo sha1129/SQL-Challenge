@@ -21,7 +21,24 @@ Number of transactions were high for deposit it is representing 45.52 % of all t
 2. What is the average total historical deposit counts and amounts for all customers?
 
 ```SQL
+WITH customerDeposit AS (
+	
+	SELECT 
+		customer_id, 
+		COUNT (txn_amount) txnCount, 
+		AVG(txn_amount) txnAvg
+	FROM customer_transactions
+	WHERE txn_type like 'deposit'
+	GROUP BY customer_id
+)
+
+SELECT 
+	ROUND(AVG(txnCount),2) AS avgNumberTransactions, 
+	CONCAT('$', ROUND(AVG(txnAvg),2) )AS avgAmount
+FROM customerDeposit
 ```
+
+The avg number of deposits by customer is ~ 5.34 and the average amount they deposited were $508.61
 
 3. For each month - how many Data Bank customers make more than 1 deposit and either 1 purchase or 1 withdrawal in a single month?
 
