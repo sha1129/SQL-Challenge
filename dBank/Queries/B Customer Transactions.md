@@ -43,12 +43,40 @@ The avg number of deposits by customer is ~ 5.34 and the average amount they dep
 3. For each month - how many Data Bank customers make more than 1 deposit and either 1 purchase or 1 withdrawal in a single month?
 
 ```SQL
+SELECT customer_id, txn_date, COUNT(TXN_TYPE) as totalCount
+FROM customer_transactions
+WHERE txn_type NOT LIKE 'deposit'
+GROUP BY customer_id, mnths
+HAVING COUNT(txn_type) > 1
+
 ```
 
 4. What is the closing balance for each customer at the end of the month?
 
 ```SQL
+WITH custDeposit AS (
+	
+	SELECT customer_id,  txn_date AS months, COUNT(TXN_TYPE) as totalCountD
+	FROM customer_transactions
+	WHERE txn_type  LIKE 'deposit'
+	GROUP BY customer_id, months
+	HAVING COUNT(txn_type) > 1
+), notCustDeposit AS(
+	
+	SELECT customer_id, txn_date AS months, COUNT(TXN_TYPE) as totalCountWP
+	FROM customer_transactions
+	WHERE txn_type NOT LIKE 'deposit'
+	GROUP BY customer_id, months
+	HAVING COUNT(txn_type) > 1
+)
+
+SELECT extract (MONTH FROM cd.months) AS ms, SUM(cd.totalCountD+ncd.totalCountWP) AS TOT
+FROM custDeposit cd  JOIN notCustDeposit ncd
+	ON cd.customer_id = ncd.customer_id
+GROUP BY ms
+ORDER BY TOT DESC
 ```
+This is wrong need to rethink again 
 
 5. What is the percentage of customers who increase their closing balance by more than 5%?
 ```SQL
