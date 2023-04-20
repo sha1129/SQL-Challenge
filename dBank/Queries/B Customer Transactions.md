@@ -74,9 +74,29 @@ ORDER BY D.months
 4. What is the closing balance for each customer at the end of the month?
 
 ```SQL
+WITH customerDebit AS(
+
+	SELECT customer_id,SUM(TXN_AMOUNT) AS debit
+	FROM customer_transactions
+	WHERE txn_type LIKE 'deposit'
+	GROUP BY customer_id
+), customerCredit AS(
+	
+	SELECT customer_id,SUM(TXN_AMOUNT) AS credit
+	FROM customer_transactions
+	WHERE txn_type NOT LIKE 'deposit'
+	GROUP BY customer_id
+
+)
+
+SELECT d.customer_id, d.debit-ct.credit AS "Closting Amount"
+FROM customerDebit d LEFT JOIN customerCredit ct
+	ON d.customer_id = ct.customer_id
+ORDER BY 	customer_id
+	
 
 ```
-
+WRONGGGG need to look at it again
 
 
 
